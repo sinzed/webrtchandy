@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client A - WebRTC Manual Signaling</title>
+    <style>
+        .status { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Client A (Offerer)</h1>
+    <div id="status" class="status">Status: Ready</div>
+    <video id="localVideo" autoplay playsinline style="width:240px;"></video>
+    <br>
+    <button id="startCamera">Start Camera</button>
+    <button id="createOffer">Create Offer</button>
+    <br><br>
+    <textarea id="offer" placeholder="Offer will appear here" rows="8" cols="60"></textarea>
+    <br>
+    <textarea id="answer" placeholder="Paste answer from Client B here" rows="8" cols="60"></textarea>
+    <br>
+    <button id="setAnswer">Set Answer</button>
+    <script src="cool.js"></script>
+</body>
+</html> 
