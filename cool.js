@@ -138,4 +138,17 @@ window.addEventListener('DOMContentLoaded', () => {
     if (answerBtn) {
         answerBtn.onclick = () => downloadTextareaContent('answer', 'answer.txt');
     }
+    const muteBtn = document.getElementById('muteMic');
+    if (muteBtn) {
+        let micMuted = false;
+        muteBtn.onclick = () => {
+            if (localStream && localStream.getAudioTracks().length > 0) {
+                micMuted = !micMuted;
+                localStream.getAudioTracks().forEach(track => track.enabled = !micMuted);
+                muteBtn.textContent = micMuted ? 'Unmute Microphone' : 'Mute Microphone';
+            } else {
+                alert('Microphone not started yet!');
+            }
+        };
+    }
 }); 
