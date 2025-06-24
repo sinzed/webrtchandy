@@ -1,21 +1,20 @@
 let localStream;
 let peerConnection;
-const config = {
+const config = { 
     iceServers: [
-        { urls: 'stun:2.189.68.115:443' },
-        // { urls: 'stun:stun.l.google.com:19302' },
-        // { urls: 'stun:stun1.l.google.com:19302' },
-        // { urls: 'stun:stun2.l.google.com:19302' },
-        // { urls: 'stun:stun3.l.google.com:19302' },
-        // { urls: 'stun:stun4.l.google.com:19302' },
-        // { urls: 'stun:stun.ekiga.net' },
-        // { urls: 'stun:stun.ideasip.com' },
-        // { urls: 'stun:stun.schlund.de' },
-        // { urls: 'stun:stun.stunprotocol.org:3478' },
-        // { urls: 'stun:stun.voiparound.com' },
-        // { urls: 'stun:stun.voipbuster.com' },
-        // { urls: 'stun:stun.voipstunt.com' },
-        // { urls: 'stun:stun.voxgratia.org' }
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' },
+        { urls: 'stun:stun.ekiga.net' },
+        { urls: 'stun:stun.ideasip.com' },
+        { urls: 'stun:stun.schlund.de' },
+        { urls: 'stun:stun.stunprotocol.org:3478' },
+        { urls: 'stun:stun.voiparound.com' },
+        { urls: 'stun:stun.voipbuster.com' },
+        { urls: 'stun:stun.voipstunt.com' },
+        { urls: 'stun:stun.voxgratia.org' }
     ],
     iceCandidatePoolSize: 10,
     bundlePolicy: 'max-bundle',
@@ -29,11 +28,11 @@ const isClientA = document.getElementById('startCamera') !== null;
 // Add connection state monitoring
 function setupConnectionMonitoring(pc) {
     const statusElement = document.getElementById('status');
-
+    
     pc.onconnectionstatechange = () => {
         console.log('Connection state:', pc.connectionState);
         statusElement.textContent = `Status: ${pc.connectionState}`;
-
+        
         if (pc.connectionState === 'connected') {
             console.log('✅ P2P connection established successfully!');
             statusElement.style.background = '#d4edda';
@@ -47,16 +46,16 @@ function setupConnectionMonitoring(pc) {
             statusElement.style.color = '#856404';
         }
     };
-
+    
     pc.oniceconnectionstatechange = () => {
         console.log('ICE connection state:', pc.iceConnectionState);
         statusElement.textContent = `Status: ${pc.connectionState} (ICE: ${pc.iceConnectionState})`;
     };
-
+    
     pc.onicegatheringstatechange = () => {
         console.log('ICE gathering state:', pc.iceGatheringState);
     };
-
+    
     pc.onicecandidate = (event) => {
         if (event.candidate) {
             console.log('ICE candidate:', event.candidate.type, event.candidate.protocol);
@@ -114,28 +113,4 @@ if (isClientA) {
     document.getElementById('createAnswer').onclick = async () => {
         await peerConnection.setLocalDescription(await peerConnection.createAnswer());
     };
-}
-
-// Download utility for textareas
-function downloadTextareaContent(textareaId, filename) {
-    const text = document.getElementById(textareaId).value;
-    const blob = new Blob([text], { type: 'text/plain' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-// Attach download handlers for both clients
-window.addEventListener('DOMContentLoaded', () => {
-    const offerBtn = document.getElementById('downloadOffer');
-    const answerBtn = document.getElementById('downloadAnswer');
-    if (offerBtn) {
-        offerBtn.onclick = () => downloadTextareaContent('offer', 'offer.txt');
-    }
-    if (answerBtn) {
-        answerBtn.onclick = () => downloadTextareaContent('answer', 'answer.txt');
-    }
-}); 
+} 
