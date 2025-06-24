@@ -67,6 +67,9 @@ function setupConnectionMonitoring(pc) {
 if (isClientA) {
     // Client A (Offerer)
     const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    let remoteStream = new MediaStream();
+    remoteVideo.srcObject = remoteStream;
     document.getElementById('startCamera').onclick = async () => {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         localVideo.srcObject = localStream;
@@ -76,6 +79,9 @@ if (isClientA) {
         peerConnection = new RTCPeerConnection(config);
         setupConnectionMonitoring(peerConnection);
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        peerConnection.ontrack = (event) => {
+            event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+        };
         peerConnection.onicecandidate = (event) => {
             if (event.candidate === null) {
                 document.getElementById('offer').value = JSON.stringify(peerConnection.localDescription);
@@ -91,6 +97,7 @@ if (isClientA) {
     };
 } else {
     // Client B (Answerer)
+    const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
     let remoteStream = new MediaStream();
     remoteVideo.srcObject = remoteStream;
@@ -109,6 +116,10 @@ if (isClientA) {
             }
         };
         await peerConnection.setRemoteDescription(new RTCSessionDescription(JSON.parse(offer)));
+        // Get local media and add tracks
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     };
 
     document.getElementById('createAnswer').onclick = async () => {
