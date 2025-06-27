@@ -9,6 +9,12 @@ declare module 'wrtc' {
     localDescription: RTCSessionDescription | null;
     remoteDescription: RTCSessionDescription | null;
     ondatachannel: ((event: RTCDataChannelEvent) => void) | null;
+    onconnectionstatechange: (() => void) | null;
+    oniceconnectionstatechange: (() => void) | null;
+    onicegatheringstatechange: (() => void) | null;
+    connectionState: RTCConnectionState;
+    iceConnectionState: RTCIceConnectionState;
+    iceGatheringState: RTCIceGatheringState;
   }
 
   export class RTCSessionDescription {
@@ -57,6 +63,9 @@ declare module 'wrtc' {
   }
 
   export type RTCSdpType = 'offer' | 'answer' | 'pranswer' | 'rollback';
+  export type RTCConnectionState = 'new' | 'connecting' | 'connected' | 'disconnected' | 'failed' | 'closed';
+  export type RTCIceConnectionState = 'new' | 'checking' | 'connected' | 'completed' | 'failed' | 'disconnected' | 'closed';
+  export type RTCIceGatheringState = 'new' | 'gathering' | 'complete';
 
   export interface RTCDataChannel extends EventTarget {
     label: string;

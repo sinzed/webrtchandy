@@ -12,9 +12,36 @@ interface RTCSessionDescription {
   const peerService = new PeerConnectionService();
   const tcpProxy = new TcpProxyService();
   
+  // Add connection state monitoring
+  peerService.pc.onconnectionstatechange = () => {
+    console.log('Connection state:', peerService.pc.connectionState);
+  };
+
+  peerService.pc.oniceconnectionstatechange = () => {
+    console.log('ICE connection state:', peerService.pc.iceConnectionState);
+  };
+
+  peerService.pc.onicegatheringstatechange = () => {
+    console.log('ICE gathering state:', peerService.pc.iceGatheringState);
+  };
+  
   // For answerer, we need to listen for the data channel from the offerer
   peerService.pc.ondatachannel = (event: wrtc.RTCDataChannelEvent) => {
     const dataChannel = event.channel;
+    
+    // Monitor data channel state
+    dataChannel.onopen = () => {
+      console.log('✅ DataChannel opened! Connection established.');
+    };
+
+    dataChannel.onclose = () => {
+      console.log('❌ DataChannel closed');
+      tcpProxy.destroy();
+    };
+
+    dataChannel.onerror = (error) => {
+      console.error('❌ DataChannel error:', error);
+    };
     
     dataChannel.onmessage = (event: MessageEvent) => {
       if (typeof event.data === 'string') {
@@ -61,6 +88,8 @@ interface RTCSessionDescription {
       console.log('--- END ANSWER ---');
       
       console.log('Answer created and set. Waiting for data channel connection...');
+      console.log('Current connection state:', peerService.pc.connectionState);
+      console.log('Current ICE connection state:', peerService.pc.iceConnectionState);
     } catch (e) {
       console.error('Failed to process offer:', e);
     }
