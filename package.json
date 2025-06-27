@@ -10,6 +10,8 @@
     "answerer": "ts-node src/answerer.ts",
     "dev:answerer": "ts-node src/answerer.ts",
     "test:connection": "ts-node src/test-connection.ts",
+    "socks5:server": "ts-node src/socks5-server.ts",
+    "socks5:remote": "ts-node src/socks5-remote.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
