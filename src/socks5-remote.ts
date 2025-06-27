@@ -43,9 +43,12 @@ interface RTCSessionDescription {
     };
     
     dataChannel.onmessage = (event: MessageEvent) => {
+      console.log('📨 Received message from DataChannel:', typeof event.data, event.data.length || 'string');
+      
       if (typeof event.data === 'string') {
         try {
           const msg: ControlMessage = JSON.parse(event.data);
+          console.log('📋 Parsed control message:', msg.type, msg.connectionId || '');
           
           if (msg.type === 'connect' && msg.host && msg.port && msg.connectionId) {
             console.log(`🌐 SOCKS5 request: ${msg.connectionId} -> ${msg.host}:${msg.port}`);
@@ -62,6 +65,7 @@ interface RTCSessionDescription {
             connections.set(msg.connectionId, socket);
             
             socket.on('data', (data) => {
+              console.log(`📨 TCP data from ${msg.host}:${msg.port} to ${msg.connectionId}:`, data.length, 'bytes');
               dataChannel.send(JSON.stringify({
                 type: 'data',
                 connectionId: msg.connectionId,
@@ -93,21 +97,27 @@ interface RTCSessionDescription {
             });
             
           } else if (msg.type === 'data' && msg.connectionId && msg.data) {
+            console.log(`📨 Received data for ${msg.connectionId}:`, msg.data.length, 'bytes');
             // Forward data to TCP connection
             const socket = connections.get(msg.connectionId);
             if (socket && !socket.destroyed) {
               socket.write(Buffer.from(msg.data));
+            } else {
+              console.log(`❌ Socket not found or destroyed for ${msg.connectionId}`);
             }
           } else if (msg.type === 'closed' && msg.connectionId) {
+            console.log(`📋 Closing connection: ${msg.connectionId}`);
             // Close TCP connection
             const socket = connections.get(msg.connectionId);
             if (socket) {
               socket.destroy();
               connections.delete(msg.connectionId);
             }
+          } else {
+            console.log(`📋 Unknown message type: ${msg.type}`);
           }
         } catch (e) {
-          console.error('Invalid control message:', e);
+          console.error('❌ Invalid control message:', e);
         }
       } else {
         console.log('📨 Received binary data, length:', event.data.byteLength);

@@ -44,6 +44,7 @@ export class Socks5ProxyService extends EventEmitter {
 
     // Handle SOCKS5 handshake
     socket.once('data', (data) => {
+      console.log(`📨 SOCKS5 handshake data from ${connectionId}:`, data);
       this.handleSocks5Handshake(socket, data, connectionId);
     });
 
@@ -63,23 +64,34 @@ export class Socks5ProxyService extends EventEmitter {
   }
 
   private handleSocks5Handshake(socket: net.Socket, data: Buffer, connectionId: string): void {
+    console.log(`🔍 Processing SOCKS5 handshake for ${connectionId}`);
+    
     // SOCKS5 handshake
     if (data[0] !== 0x05) {
+      console.log(`❌ Invalid SOCKS version for ${connectionId}:`, data[0]);
       socket.end();
       return;
     }
 
+    console.log(`✅ SOCKS5 version check passed for ${connectionId}`);
+
     // Send authentication method (no auth)
-    socket.write(Buffer.from([0x05, 0x00]));
+    const response = Buffer.from([0x05, 0x00]);
+    console.log(`📤 Sending auth response to ${connectionId}:`, response);
+    socket.write(response);
 
     // Wait for connection request
     socket.once('data', (requestData) => {
+      console.log(`📨 SOCKS5 request data from ${connectionId}:`, requestData);
       this.handleSocks5Request(socket, requestData, connectionId);
     });
   }
 
   private handleSocks5Request(socket: net.Socket, data: Buffer, connectionId: string): void {
+    console.log(`🔍 Processing SOCKS5 request for ${connectionId}`);
+    
     if (data[0] !== 0x05 || data[1] !== 0x01) {
+      console.log(`❌ Invalid SOCKS5 request for ${connectionId}: version=${data[0]}, command=${data[1]}`);
       socket.end();
       return;
     }
@@ -88,20 +100,26 @@ export class Socks5ProxyService extends EventEmitter {
     let host: string;
     let port: number;
 
+    console.log(`📋 Address type for ${connectionId}:`, addressType);
+
     if (addressType === 0x01) {
       // IPv4
       host = `${data[4]}.${data[5]}.${data[6]}.${data[7]}`;
       port = data.readUInt16BE(8);
+      console.log(`🌐 IPv4 request for ${connectionId}: ${host}:${port}`);
     } else if (addressType === 0x03) {
       // Domain name
       const domainLength = data[4];
       if (domainLength === undefined) {
+        console.log(`❌ Invalid domain length for ${connectionId}`);
         socket.end();
         return;
       }
       host = data.slice(5, 5 + domainLength).toString();
       port = data.readUInt16BE(5 + domainLength);
+      console.log(`🌐 Domain request for ${connectionId}: ${host}:${port}`);
     } else {
+      console.log(`❌ Unsupported address type for ${connectionId}:`, addressType);
       socket.end();
       return;
     }
@@ -109,12 +127,14 @@ export class Socks5ProxyService extends EventEmitter {
     console.log(`🌐 SOCKS5 request: ${connectionId} -> ${host}:${port}`);
 
     // Send connection request to remote peer
-    this.sendControlMessage({
+    const controlMsg: ControlMessage = {
       type: 'connect',
       host,
       port,
       connectionId
-    });
+    };
+    console.log(`📤 Sending control message to remote:`, controlMsg);
+    this.sendControlMessage(controlMsg);
 
     // Send success response to client
     const response = Buffer.from([
@@ -122,17 +142,28 @@ export class Socks5ProxyService extends EventEmitter {
       0x00, 0x00, 0x00, 0x00, // IP (ignored by most clients)
       0x00, 0x00              // Port (ignored by most clients)
     ]);
+    console.log(`📤 Sending success response to ${connectionId}:`, response);
     socket.write(response);
+
+    // Set up data forwarding
+    socket.on('data', (data) => {
+      console.log(`📨 Data from ${connectionId} to remote:`, data.length, 'bytes');
+      this.sendDataToRemote(connectionId, data);
+    });
   }
 
   handleRemoteData(connectionId: string, data: Buffer): void {
+    console.log(`📨 Data from remote to ${connectionId}:`, data.length, 'bytes');
     const socket = this.connections.get(connectionId);
     if (socket && !socket.destroyed) {
       socket.write(data);
+    } else {
+      console.log(`❌ Socket not found or destroyed for ${connectionId}`);
     }
   }
 
   handleRemoteConnectionStatus(connectionId: string, status: 'connected' | 'closed' | 'error', message?: string): void {
+    console.log(`📋 Remote status for ${connectionId}:`, status, message || '');
     const socket = this.connections.get(connectionId);
     if (socket) {
       if (status === 'connected') {
@@ -144,18 +175,23 @@ export class Socks5ProxyService extends EventEmitter {
         console.error(`❌ Remote connection error: ${connectionId}`, message);
         socket.end();
       }
+    } else {
+      console.log(`❌ Socket not found for ${connectionId}`);
     }
   }
 
   sendDataToRemote(connectionId: string, data: Buffer): void {
-    this.sendControlMessage({
+    const controlMsg: ControlMessage = {
       type: 'data',
       connectionId,
       data
-    });
+    };
+    console.log(`📤 Sending data to remote for ${connectionId}:`, data.length, 'bytes');
+    this.sendControlMessage(controlMsg);
   }
 
   private sendControlMessage(message: ControlMessage): void {
+    console.log(`📤 Sending control message:`, message.type, message.connectionId || '');
     this.dataChannel.send(JSON.stringify(message));
   }
 
