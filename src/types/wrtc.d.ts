@@ -8,12 +8,17 @@ declare module 'wrtc' {
     setRemoteDescription(description: RTCSessionDescription): Promise<void>;
     localDescription: RTCSessionDescription | null;
     remoteDescription: RTCSessionDescription | null;
+    ondatachannel: ((event: RTCDataChannelEvent) => void) | null;
   }
 
   export class RTCSessionDescription {
     constructor(descriptionInitDict: RTCSessionDescriptionInit);
     type: RTCSdpType;
     sdp: string;
+  }
+
+  export interface RTCDataChannelEvent {
+    channel: RTCDataChannel;
   }
 
   export interface RTCConfiguration {

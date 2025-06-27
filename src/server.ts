@@ -1,7 +1,7 @@
 import { PeerConnectionService } from './services/PeerConnectionService';
 import { TcpProxyService, ControlMessage } from './services/TcpProxyService';
 import { SignalingModule } from './modules/SignalingModule';
-import wrtc from 'wrtc';
+
 
 // Type definitions
 interface RTCSessionDescription {
@@ -41,7 +41,7 @@ interface RTCSessionDescription {
   };
 
   // Manual signaling: create offer, print, accept answer
-  const offer = await peerService.createOffer();
+  await peerService.createOffer();
   SignalingModule.printOffer(peerService.pc.localDescription);
   const answerStr = await SignalingModule.getRemoteAnswer();
   try {

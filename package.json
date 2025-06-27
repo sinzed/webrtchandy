@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
+    "answerer": "ts-node src/answerer.ts",
+    "dev:answerer": "ts-node src/answerer.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
