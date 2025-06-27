@@ -10,7 +10,14 @@ interface RTCSessionDescription {
 }
 
 (async (): Promise<void> => {
-  const peerService = new PeerConnectionService();
+  const peerService = new PeerConnectionService({
+    iceServers: [
+      { urls: 'stun:2.189.68.115:443' },
+      // { urls: 'stun:stun.voiparound.com:3478' },
+      // { urls: 'stun:stun.voipbuster.com:3478' },
+      // { urls: 'stun:stun.voipstunt.com:3478' }
+    ]
+  });
   const connections: Map<string, net.Socket> = new Map();
   
   // Add connection state monitoring
