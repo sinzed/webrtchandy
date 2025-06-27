@@ -23,8 +23,7 @@ export class PeerConnectionService {
       ]
     };
 
-    // const finalConfig = configuration || defaultConfig;
-    const finalConfig = defaultConfig;
+    const finalConfig = configuration || defaultConfig;
     this.pc = new wrtc.RTCPeerConnection(finalConfig);
     this.dataChannel = this.pc.createDataChannel('proxy');
   }
