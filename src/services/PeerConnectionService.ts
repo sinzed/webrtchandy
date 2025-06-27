@@ -4,8 +4,19 @@ export class PeerConnectionService {
   public pc: wrtc.RTCPeerConnection;
   public dataChannel: wrtc.RTCDataChannel;
 
-  constructor() {
-    this.pc = new wrtc.RTCPeerConnection();
+  constructor(configuration?: wrtc.RTCConfiguration) {
+    const defaultConfig: wrtc.RTCConfiguration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' }
+      ]
+    };
+
+    const finalConfig = configuration || defaultConfig;
+    this.pc = new wrtc.RTCPeerConnection(finalConfig);
     this.dataChannel = this.pc.createDataChannel('proxy');
   }
 
