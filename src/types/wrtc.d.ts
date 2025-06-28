@@ -29,6 +29,10 @@ declare module 'wrtc' {
 
   export interface RTCConfiguration {
     iceServers?: RTCIceServer[];
+    bundlePolicy?: RTCBundlePolicy;
+    iceCandidatePoolSize?: number;
+    rtcpMuxPolicy?: RTCRtcpMuxPolicy;
+    iceTransportPolicy?: RTCIceTransportPolicy;
   }
 
   export interface RTCIceServer {
@@ -87,4 +91,8 @@ declare module 'wrtc' {
   }
 
   export type RTCDataChannelState = 'connecting' | 'open' | 'closing' | 'closed';
+
+  export type RTCBundlePolicy = 'balanced' | 'max-bundle' | 'max-compat';
+  export type RTCRtcpMuxPolicy = 'require' | 'negotiate';
+  export type RTCIceTransportPolicy = 'all' | 'relay';
 } 

@@ -20,7 +20,11 @@ export class PeerConnectionService {
         { urls: 'stun:stun.voipbuster.com' },
         { urls: 'stun:stun.voipstunt.com' },
         { urls: 'stun:stun.voxgratia.org' }
-      ]
+      ],
+      bundlePolicy: 'max-bundle',
+      iceCandidatePoolSize: 10,
+      rtcpMuxPolicy: 'require',
+      iceTransportPolicy: 'all'
     };
 
     const finalConfig = configuration || defaultConfig;
