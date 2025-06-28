@@ -9,88 +9,9 @@ export class EnhancedSdpService {
     // Create the initial offer
     const offer = await pc.createOffer();
     
-    // Enhance the SDP with additional attributes for better compatibility
-    let enhancedSdp = offer.sdp;
-    
-    // Add additional SDP attributes for better browser compatibility
-    enhancedSdp = this.addEnhancedSdpAttributes(enhancedSdp);
-    
-    // Create enhanced offer
-    const enhancedOffer = new wrtc.RTCSessionDescription({
-      type: 'offer',
-      sdp: enhancedSdp
-    });
-    
-    return enhancedOffer;
-  }
-  
-  /**
-   * Adds browser-like SDP attributes for better compatibility
-   */
-  private static addEnhancedSdpAttributes(sdp: string): string {
-    let enhancedSdp = sdp;
-    
-    // Add additional session-level attributes
-    const sessionAttributes = [
-      'a=ice-options:trickle',
-      'a=group:BUNDLE 0',
-      'a=extmap-allow-mixed',
-      'a=msid-semantic: WMS'
-    ];
-    
-    // Insert session attributes after the timing line
-    const timingLineIndex = enhancedSdp.indexOf('t=0 0');
-    if (timingLineIndex !== -1) {
-      const afterTiming = enhancedSdp.indexOf('\r\n', timingLineIndex) + 2;
-      enhancedSdp = enhancedSdp.slice(0, afterTiming) + 
-                   sessionAttributes.join('\r\n') + '\r\n' + 
-                   enhancedSdp.slice(afterTiming);
-    }
-    
-    // Add media-level attributes for better compatibility
-    enhancedSdp = this.addMediaLevelAttributes(enhancedSdp);
-    
-    return enhancedSdp;
-  }
-  
-  /**
-   * Adds media-level attributes for better browser compatibility
-   */
-  private static addMediaLevelAttributes(sdp: string): string {
-    let enhancedSdp = sdp;
-    
-    // Find media sections and enhance them
-    const mediaSections = enhancedSdp.split('m=');
-    
-    for (let i = 1; i < mediaSections.length; i++) {
-      const mediaSection = mediaSections[i];
-      if (!mediaSection) continue;
-      
-      const mediaType = mediaSection.split(' ')[0];
-      
-      if (mediaType === 'application') {
-        // Add application-specific attributes
-        const enhancedMediaSection = this.addApplicationMediaAttributes(mediaSection);
-        mediaSections[i] = enhancedMediaSection;
-      }
-    }
-    
-    return 'm=' + mediaSections.slice(1).join('m=');
-  }
-  
-  /**
-   * Adds application media attributes for data channels
-   */
-  private static addApplicationMediaAttributes(mediaSection: string): string {
-    const additionalAttributes = [
-      'a=mid:0',
-      'a=sctp-port:5000',
-      'a=max-message-size:262144',
-      'a=setup:actpass',
-      'a=ice-options:trickle'
-    ];
-    
-    return mediaSection + '\r\n' + additionalAttributes.join('\r\n');
+    // For now, just return the original offer without modification
+    // to avoid SDP format issues
+    return offer;
   }
   
   /**

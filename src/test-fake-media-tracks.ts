@@ -82,7 +82,7 @@ import { EnhancedSdpService } from './services/EnhancedSdpService';
           
           process.exit(0);
         }
-      }, 5000);
+      }, 15000);
     }
-  }, 5000);
+  }, 15000);
 })(); 

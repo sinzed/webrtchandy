@@ -61,7 +61,7 @@ export class PeerConnectionService {
     this.iceGatheringTimeout = setTimeout(() => {
       console.log('⏰ ICE gathering timeout - proceeding with current candidates');
       this.onIceGatheringComplete();
-    }, 10000); // 10 seconds for ICE gathering
+    }, 30000); // Increased from 10 seconds to 30 seconds
   }
 
   private onIceGatheringComplete(): void {
@@ -83,7 +83,18 @@ export class PeerConnectionService {
       console.log('   Connection state:', this.pc.connectionState);
       console.log('   ICE connection state:', this.pc.iceConnectionState);
       console.log('   ICE gathering state:', this.pc.iceGatheringState);
-    }, 30000); // 30 seconds
+      
+      // Provide more detailed troubleshooting information
+      if (this.pc.iceConnectionState === 'failed') {
+        console.log('\n🔧 Troubleshooting suggestions:');
+        console.log('   1. Check if both peers are on different networks');
+        console.log('   2. Try using mobile hotspot on one peer');
+        console.log('   3. Check firewall/antivirus settings');
+        console.log('   4. Verify TURN servers are accessible');
+        console.log('   5. Try from different network locations');
+        console.log('   6. Consider using a VPN or different network');
+      }
+    }, 60000); // Increased from 30 seconds to 60 seconds
   }
 
   private resetConnectionTimeout(): void {
@@ -94,13 +105,13 @@ export class PeerConnectionService {
   }
 
   async createOffer(): Promise<wrtc.RTCSessionDescription> {
-    console.log('📤 Creating enhanced offer...');
+    console.log('📤 Creating offer with fake media tracks...');
     
-    // Use enhanced SDP service for better browser compatibility
-    const offer = await EnhancedSdpService.createEnhancedOffer(this.pc);
+    // Use standard createOffer to avoid SDP format issues
+    const offer = await this.pc.createOffer();
     await this.pc.setLocalDescription(offer);
     
-    console.log('✅ Enhanced offer created and set');
+    console.log('✅ Offer created and set with fake media tracks');
     return offer;
   }
 
