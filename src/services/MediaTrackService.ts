@@ -32,18 +32,15 @@ export class MediaTrackService {
         const audioSource = new nonstandard.RTCAudioSource();
         const audioTrack = audioSource.createTrack();
         
-        // Create a fake MediaStream for the audio track
-        const audioStream = new wrtc.MediaStream([audioTrack]);
-        
-        // Add the track to the peer connection
-        pc.addTrack(audioTrack, audioStream);
+        // Add the track to the peer connection (no MediaStream needed)
+        (pc as any).addTrack(audioTrack);
         
         console.log('🎵 Added fake audio track');
       } else {
         console.log('⚠️  RTCAudioSource not available in this wrtc version');
       }
     } catch (error) {
-      console.log('⚠️  Could not add fake audio track:', error.message);
+      console.log('⚠️  Could not add fake audio track:', (error as Error).message || error);
     }
   }
   
@@ -59,18 +56,15 @@ export class MediaTrackService {
         const videoSource = new nonstandard.RTCVideoSource();
         const videoTrack = videoSource.createTrack();
         
-        // Create a fake MediaStream for the video track
-        const videoStream = new wrtc.MediaStream([videoTrack]);
-        
-        // Add the track to the peer connection
-        pc.addTrack(videoTrack, videoStream);
+        // Add the track to the peer connection (no MediaStream needed)
+        (pc as any).addTrack(videoTrack);
         
         console.log('📹 Added fake video track');
       } else {
         console.log('⚠️  RTCVideoSource not available in this wrtc version');
       }
     } catch (error) {
-      console.log('⚠️  Could not add fake video track:', error.message);
+      console.log('⚠️  Could not add fake video track:', (error as Error).message || error);
     }
   }
   
@@ -105,15 +99,15 @@ export class MediaTrackService {
       
       // Try to add them (this might not work with all wrtc versions)
       try {
-        pc.addTrack(fakeAudioTrack as any, new wrtc.MediaStream());
-        pc.addTrack(fakeVideoTrack as any, new wrtc.MediaStream());
+        (pc as any).addTrack(fakeAudioTrack as any);
+        (pc as any).addTrack(fakeVideoTrack as any);
         console.log('✅ Added alternative fake tracks');
       } catch (error) {
-        console.log('⚠️  Alternative method failed:', error.message);
+        console.log('⚠️  Alternative method failed:', (error as Error).message || error);
       }
       
     } catch (error) {
-      console.log('⚠️  Alternative fake track method failed:', error.message);
+      console.log('⚠️  Alternative fake track method failed:', (error as Error).message || error);
     }
   }
   
@@ -127,7 +121,6 @@ export class MediaTrackService {
       console.log('🔍 wrtc Media Support Check:');
       console.log('   RTCAudioSource available:', !!nonstandard?.RTCAudioSource);
       console.log('   RTCVideoSource available:', !!nonstandard?.RTCVideoSource);
-      console.log('   MediaStream available:', !!wrtc.MediaStream);
       console.log('   RTCPeerConnection available:', !!wrtc.RTCPeerConnection);
       
       if (nonstandard?.RTCAudioSource && nonstandard?.RTCVideoSource) {
@@ -137,7 +130,7 @@ export class MediaTrackService {
         console.log('   This is normal for some wrtc versions');
       }
     } catch (error) {
-      console.log('❌ Could not check wrtc media support:', error.message);
+      console.log('❌ Could not check wrtc media support:', (error as Error).message || error);
     }
   }
 } 
