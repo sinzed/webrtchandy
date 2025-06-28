@@ -12,6 +12,7 @@ declare module 'wrtc' {
     onconnectionstatechange: (() => void) | null;
     oniceconnectionstatechange: (() => void) | null;
     onicegatheringstatechange: (() => void) | null;
+    onicecandidate: ((event: RTCPeerConnectionIceEvent) => void) | null;
     connectionState: RTCConnectionState;
     iceConnectionState: RTCIceConnectionState;
     iceGatheringState: RTCIceGatheringState;
@@ -95,4 +96,20 @@ declare module 'wrtc' {
   export type RTCBundlePolicy = 'balanced' | 'max-bundle' | 'max-compat';
   export type RTCRtcpMuxPolicy = 'require' | 'negotiate';
   export type RTCIceTransportPolicy = 'all' | 'relay';
+
+  export interface RTCPeerConnectionIceEvent {
+    candidate: RTCIceCandidate | null;
+  }
+
+  export interface RTCIceCandidate {
+    candidate: string;
+    sdpMLineIndex: number | null;
+    sdpMid: string | null;
+    type: RTCIceCandidateType;
+    protocol: RTCIceProtocol;
+    address: string;
+  }
+
+  export type RTCIceCandidateType = 'host' | 'srflx' | 'prflx' | 'relay';
+  export type RTCIceProtocol = 'udp' | 'tcp';
 } 
