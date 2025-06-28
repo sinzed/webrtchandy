@@ -1,6 +1,5 @@
 import { PeerConnectionService } from './services/PeerConnectionService';
 import { SignalingModule } from './modules/SignalingModule';
-import wrtc from 'wrtc';
 
 interface RTCSessionDescription {
   type: 'offer' | 'answer';
